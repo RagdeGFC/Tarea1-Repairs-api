@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { UserController } from './controller';
 import { UserService } from '../services/user.service';
+import { AuthMiddleware } from '../middlewares/auth.middleware';
 
 export class UserRouter {
 	static get routes(): Router {
@@ -9,16 +10,14 @@ export class UserRouter {
 		const userService = new UserService();
 		const controller = new UserController(userService); //inyeccion de dependencia
 
-		router.get('/', controller.findAllUsers);
-		router.get('/:id', controller.findOneUser);
-
-		// router.post('/login', controller.loginUser);
+		router.post('/login', controller.loginUser);
 		router.post('/', controller.createUser);
 
-		// router.use(AuthMiddleware.protect);
+		router.use(AuthMiddleware.protect);
 
+		router.get('/', controller.findAllUsers);
+		router.get('/:id', controller.findOneUser);
 		router.patch('/:id', controller.updateUser);
-
 		router.delete('/:id', controller.deleteUser);
 
 		return router;

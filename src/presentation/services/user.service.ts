@@ -1,3 +1,5 @@
+import { bcryptAdapter } from '../../config/bcrypt.adapter';
+import { JwtAdapter } from '../../config/jwt.adapter';
 import { Status, User } from '../../data/postgres/models/user.model';
 import { CustomError } from '../../domain';
 import { CreateUserDTO } from '../../domain/dtos/users/create-user.dto';
@@ -42,8 +44,15 @@ export class UserService {
 		user.role = data.role;
 
 		try {
-			return await user.save();
+			const newUser = await user.save();
+			return {
+				id: newUser.id,
+				name: newUser.name,
+				email: newUser.email,
+				role: newUser.role,
+			};
 		} catch (error) {
+			console.error(error);
 			throw CustomError.internalServer('Error creating user.');
 		}
 	}
@@ -71,5 +80,40 @@ export class UserService {
 		} catch (error) {
 			throw CustomError.internalServer('Error deleting user');
 		}
+	}
+
+	async login(email: string, password: string) {
+		const user = await this.findUserByEmail(email);
+
+		const isMatching = await bcryptAdapter.compare(password, user.password);
+		if (!isMatching) throw CustomError.unAuthorized('Invalid credentials');
+
+		const token = await JwtAdapter.generateToken({ id: user.id });
+		if (!token) throw CustomError.internalServer('Error generating token');
+
+		return {
+			token,
+			user: {
+				id: user.id,
+				name: user.name,
+				email: user.email,
+				role: user.role,
+			},
+		};
+	}
+
+	async findUserByEmail(email: string) {
+		const user = await User.findOne({
+			where: {
+				email,
+				status: Status.AVAILABLE,
+			},
+		});
+
+		if (!user) {
+			throw CustomError.notFound('User not found');
+		}
+
+		return user;
 	}
 }

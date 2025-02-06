@@ -24,3 +24,4 @@ async function main() {
 }
 
 main();
+console.log('JWT_SECRET:', envs.JWT_SECRET);

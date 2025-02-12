@@ -3,9 +3,11 @@ import {
 	BeforeInsert,
 	Column,
 	Entity,
+	OneToMany,
 	PrimaryGeneratedColumn,
 } from 'typeorm';
 import { bcryptAdapter } from '../../../config/bcrypt.adapter';
+import { Repair } from './repair.model';
 
 export enum Role {
 	EMPLOYEE = 'EMPLOYEE',
@@ -20,37 +22,40 @@ export enum Status {
 @Entity()
 export class User extends BaseEntity {
 	@PrimaryGeneratedColumn('uuid')
-	id!: string;
+	id: string;
 
 	@Column('varchar', {
 		// lenght: 80,
 		nullable: false,
 	})
-	name!: string;
+	name: string;
 
 	@Column('varchar', {
 		// lenght: 80,
 		nullable: false,
 		unique: true,
 	})
-	email!: string;
+	email: string;
 
 	@Column('varchar', {
 		nullable: false,
 	})
-	password!: string;
+	password: string;
 
 	@Column('enum', {
 		enum: Role,
 		default: Role.CLIENT,
 	})
-	role!: Role;
+	role: Role;
 
 	@Column('enum', {
 		enum: Status,
 		default: Status.AVAILABLE,
 	})
-	status!: Status;
+	status: Status;
+
+	@OneToMany(() => Repair, (repair) => repair.user)
+	repairs: Repair[];
 
 	@BeforeInsert()
 	async hashPassword() {

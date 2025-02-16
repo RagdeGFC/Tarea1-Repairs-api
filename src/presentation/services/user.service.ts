@@ -1,7 +1,7 @@
 import { bcryptAdapter } from '../../config/bcrypt.adapter';
 import { JwtAdapter } from '../../config/jwt.adapter';
-import { Status, User } from '../../data/postgres/models/user.model';
-import { CustomError } from '../../domain';
+import { Status, Role, User } from '../../data/postgres/models/user.model';
+import { CustomError } from '../../domain/services';
 import { CreateUserDTO } from '../../domain/dtos/users/create-user.dto';
 import { UpdateUserDTO } from '../../domain/dtos/users/update-user.dto';
 

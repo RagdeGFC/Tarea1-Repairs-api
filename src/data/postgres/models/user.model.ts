@@ -1,13 +1,14 @@
+import * as bcrypt from 'bcrypt';
 import {
-	BaseEntity,
-	BeforeInsert,
-	Column,
 	Entity,
-	OneToMany,
 	PrimaryGeneratedColumn,
+	Column,
+	OneToMany,
+	BaseEntity,
 } from 'typeorm';
-import { bcryptAdapter } from '../../../config/bcrypt.adapter';
-import { Repair } from './repair.model';
+import { SecurityBox } from './securityBox.model';
+import { Password } from './password.model';
+import { Pin } from './pin/pin.model';
 
 export enum Role {
 	EMPLOYEE = 'EMPLOYEE',
@@ -22,43 +23,41 @@ export enum Status {
 @Entity()
 export class User extends BaseEntity {
 	@PrimaryGeneratedColumn('uuid')
-	id: string;
+	id!: string;
 
-	@Column('varchar', {
-		// lenght: 80,
-		nullable: false,
-	})
-	name: string;
+	@Column('enum', { enum: Status, default: Status.AVAILABLE })
+	status!: Status;
 
-	@Column('varchar', {
-		// lenght: 80,
-		nullable: false,
-		unique: true,
-	})
-	email: string;
+	@Column({ nullable: false }) //1
+	name!: string;
 
-	@Column('varchar', {
-		nullable: false,
-	})
-	password: string;
+	@Column({ nullable: false }) //2
+	surname?: string;
 
-	@Column('enum', {
-		enum: Role,
-		default: Role.CLIENT,
-	})
-	role: Role;
+	@Column({ unique: true, nullable: false }) //3
+	email!: string;
 
-	@Column('enum', {
-		enum: Status,
-		default: Status.AVAILABLE,
-	})
-	status: Status;
+	@Column({ nullable: false }) //4
+	password!: string;
 
-	@OneToMany(() => Repair, (repair) => repair.user)
-	repairs: Repair[];
+	@Column({ nullable: false }) //5
+	cellphone!: string;
 
-	@BeforeInsert()
-	async hashPassword() {
-		this.password = await bcryptAdapter.encrypt(this.password);
-	}
+	@Column({ nullable: true })
+	recoveryCode?: string;
+
+	@Column({ nullable: true })
+	securityPin?: string;
+
+	@Column('enum', { enum: Role, default: Role.CLIENT })
+	role!: Role;
+
+	@OneToMany(() => SecurityBox, (securityBox) => securityBox.user)
+	securityBoxes!: SecurityBox;
+
+	@OneToMany(() => Password, (password) => password.user)
+	passwords!: Password;
+
+	@OneToMany(() => Pin, (pin) => pin.user)
+	pins!: Pin;
 }

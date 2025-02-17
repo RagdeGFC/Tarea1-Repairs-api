@@ -59,5 +59,6 @@ export class User extends BaseEntity {
 	passwords!: Password;
 
 	@OneToMany(() => Pin, (pin) => pin.user)
-	pins!: Pin;
+	pins!: Pin[]; // 🔹 Ahora `pins` es un array correctamente definido
+	// pins!: Pin;
 }

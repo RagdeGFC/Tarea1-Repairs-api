@@ -1,9 +1,9 @@
-import { AppDataSource } from '../config/ormconfig';
-import { CredentialStorage } from '../entities/CredentialStorage';
-import { SecurityBox } from '../entities/SecurityBox';
-import { User } from '../entities/User';
 import crypto from 'crypto';
 import { UserService } from './user.service';
+import { CredentialStorage } from '../../../data/postgres/models/credentialStorage.model';
+import { AppDataSource } from '../../../data/postgres/postgres-database';
+import { SecurityBox } from '../../../data/postgres/models/securityBox.model';
+import { User } from '../../../data/postgres/models/user.model';
 
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'mySecretKey123456';
 const IV_LENGTH = 16;
@@ -39,6 +39,7 @@ export class CredentialService {
 		const credentialRepository = AppDataSource.getRepository(CredentialStorage);
 
 		const isValidPin = await UserService.validateSecurityPin(userId, pin);
+
 		if (!isValidPin) throw new Error('PIN de seguridad incorrecto');
 
 		const credentials = await credentialRepository.find({

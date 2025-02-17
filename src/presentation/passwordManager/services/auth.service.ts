@@ -1,8 +1,8 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { User } from '../entities/User';
-import { AppDataSource } from '../config/ormconfig';
 import dotenv from 'dotenv';
+import { AppDataSource } from '../../../data/postgres/postgres-database';
+import { User } from '../../../data/postgres/models/user.model';
 
 dotenv.config();
 

@@ -41,4 +41,15 @@ export class UserService {
 		const token = JwtAdapter.generateToken({ id: user.id });
 		return { user, token };
 	}
+
+	static async validateSecurityPin(
+		userId: string,
+		pin: string,
+	): Promise<boolean> {
+		const userRepository = AppDataSource.getRepository(User);
+		const user = await userRepository.findOne({ where: { id: userId } });
+
+		if (!user || user.securityPin !== pin) return false;
+		return true;
+	}
 }

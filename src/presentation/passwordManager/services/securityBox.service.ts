@@ -1,6 +1,6 @@
-import { AppDataSource } from '../config/ormconfig';
-import { SecurityBox } from '../entities/SecurityBox';
-import { User } from '../entities/User';
+import { SecurityBox } from '../../../data/postgres/models/securityBox.model';
+import { User } from '../../../data/postgres/models/user.model';
+import { AppDataSource } from '../../../data/postgres/postgres-database';
 
 export class SecurityBoxService {
 	static async createSecurityBox(

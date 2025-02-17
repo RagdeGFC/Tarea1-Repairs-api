@@ -1,6 +1,6 @@
-import { AppDataSource } from '../config/ormconfig';
-import { Password } from '../entities/Password';
-import { User } from '../entities/User';
+import { Password } from '../../../data/postgres/models/password.model';
+import { User } from '../../../data/postgres/models/user.model';
+import { AppDataSource } from '../../../data/postgres/postgres-database';
 import { encryptPassword, decryptPassword } from '../utils/encryption';
 
 export class PasswordService {

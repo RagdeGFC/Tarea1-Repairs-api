@@ -26,6 +26,8 @@ export class UserController {
 
 	async createUser(req: Request, res: Response) {
 		try {
+			console.log('📌 createUser() fue llamado con datos:', req.body); // Agregar log
+
 			const newUser = await this.userService.create(req.body);
 			res.status(201).json(newUser);
 		} catch (error) {

@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { SecurityBox } from './securityBox.model';
 import { Password } from './password.model';
-import { Pin } from './pin/pin.model';
+import Pin from './pin/pin.model';
 
 export enum Role {
 	EMPLOYEE = 'EMPLOYEE',

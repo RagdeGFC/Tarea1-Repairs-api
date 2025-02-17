@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { CredentialService } from '../services/credential.service';
-import { Pin } from '../../data/postgres/models/pin/pin.model';
+// import { Pin } from '../../data/postgres/models/pin/pin.model';
 import '../../types/express';
 
 //... resto del código...

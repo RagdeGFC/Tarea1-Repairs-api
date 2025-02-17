@@ -1,21 +1,18 @@
 import { Router } from 'express';
 import { UserController } from '../controllers/user.controller';
 import { UserService } from '../services/user.service';
-import { AuthMiddleware } from '../../middlewares/auth.middleware';
 
 const router = Router();
 const userService = new UserService();
 const controller = new UserController(userService);
 
-// Rutas del gestor de contraseñas
-router.post('/login', controller.loginUser);
-router.post('/register', controller.createUser);
-router.use(AuthMiddleware.protect); // Middleware de autenticación
+// ✅ Definir rutas correctamente
+router.post('/register', (req, res) => controller.createUser(req, res));
+router.post('/login', (req, res) => controller.loginUser(req, res));
+router.get('/', (req, res) => controller.findAllUsers(req, res));
+router.get('/:id', (req, res) => controller.findOneUser(req, res));
+router.patch('/:id', (req, res) => controller.updateUser(req, res));
+router.delete('/:id', (req, res) => controller.deleteUser(req, res));
 
-// Endpoints principales
-router.get('/', controller.findAllUsers);
-router.get('/:id', controller.findOneUser);
-router.patch('/:id', controller.updateUser);
-router.delete('/:id', controller.deleteUser);
-
+// ✅ Exportar correctamente el router
 export default router;

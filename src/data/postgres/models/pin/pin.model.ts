@@ -9,7 +9,7 @@ import { User } from '../user.model';
 import { CredentialStorage } from '../credentialStorage.model';
 
 @Entity('pin')
-export class Pin {
+class Pin {
 	@PrimaryGeneratedColumn('uuid')
 	id!: string;
 
@@ -22,3 +22,4 @@ export class Pin {
 	@OneToMany(() => CredentialStorage, (credential) => credential.pin)
 	credentials!: CredentialStorage[];
 }
+export default Pin;

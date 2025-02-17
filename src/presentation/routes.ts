@@ -1,14 +1,15 @@
 import { Router } from 'express';
-import { UserRouter } from './user/routes';
-// import { RepairRoutes } from './repair/routes';
+import userRoutes from './passwordManager/routes/user.routes';
+import authRoutes from './routes/auth.routes';
 
-export class AppRoutes {
-	static get routes(): Router {
-		const router = Router();
+const router = Router();
 
-		router.use('/api/v1/users', UserRouter.routes);
-		// router.use('/api/v1/repairs', RepairRoutes.routes);
+router.use('/api/auth', authRoutes);
+router.use('/api/user', userRoutes);
 
-		return router;
-	}
-}
+console.log('📌 Rutas registradas en routes.ts:');
+router.stack.forEach((r) =>
+	console.log(r.route?.path || 'Middleware sin ruta'),
+);
+
+export default router;

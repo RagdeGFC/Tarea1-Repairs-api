@@ -1,17 +1,23 @@
 import { Request, Response } from 'express';
-import { AuthService } from '../../domain/services/auth.service';
 
 export class AuthController {
-	static async login(req: Request, res: Response) {
+	async login(req: Request, res: Response) {
 		try {
-			const { email, password } = req.body;
-			const token = await AuthService.login(email, password);
-			res.json({ message: 'Login successful', token });
+			// Aquí irá la lógica para autenticar al usuario
+			return res.status(200).json({ message: 'Login exitoso' });
 		} catch (error) {
-			// Verificamos si el error es una instancia de Error antes de acceder a .message
-			const errorMessage =
-				error instanceof Error ? error.message : 'Unknown error';
-			res.status(401).json({ error: errorMessage });
+			return res.status(500).json({ message: 'Error en login' });
+		}
+	}
+
+	async register(req: Request, res: Response) {
+		try {
+			// Aquí irá la lógica para registrar un usuario
+			return res
+				.status(201)
+				.json({ message: 'Usuario registrado exitosamente' });
+		} catch (error) {
+			return res.status(500).json({ message: 'Error en registro' });
 		}
 	}
 }

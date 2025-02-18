@@ -1,90 +1,70 @@
 import { bcryptAdapter } from '../../config/bcrypt.adapter';
 import { JwtAdapter } from '../../config/jwt.adapter';
-import { Status, Role, User } from '../../data/postgres/models/user.model';
+import { Status, User } from '../../data/postgres/models/user.model';
 import { CustomError } from '../../domain/services';
 import { CreateUserDTO } from '../../domain/dtos/users/create-user.dto';
 import { UpdateUserDTO } from '../../domain/dtos/users/update-user.dto';
+import { AppDataSource } from '../../data/postgres/postgres-database';
 
 export class UserService {
-	async findOne(id: string) {
-		const user = await User.findOne({
-			where: {
-				status: Status.AVAILABLE,
-				id: id,
-			},
+	private userRepository = AppDataSource.getRepository(User);
+
+	// Obtener un usuario por ID
+	async findOne(id: string): Promise<User> {
+		const user = await this.userRepository.findOne({
+			where: { id, status: Status.AVAILABLE },
 		});
-
-		if (!user) {
-			throw CustomError.notFound('User not found');
-		}
-
+		if (!user) throw CustomError.notFound('User not found');
 		return user;
 	}
 
-	async findAll() {
-		try {
-			const users = await User.find({
-				where: {
-					status: Status.AVAILABLE,
-				},
-			});
-
-			return users;
-		} catch (error) {
-			throw CustomError.internalServer('Error fetching users');
-		}
+	// Obtener todos los usuarios activos
+	async findAll(): Promise<User[]> {
+		return await this.userRepository.find({
+			where: { status: Status.AVAILABLE },
+		});
 	}
 
-	async create(data: CreateUserDTO) {
-		const user = new User();
-
-		user.name = data.name;
-		user.email = data.email;
-		user.password = data.password;
-		user.role = data.role;
+	// Crear un nuevo usuario
+	async create(data: CreateUserDTO): Promise<User> {
+		const newUser = this.userRepository.create({
+			name: data.name,
+			email: data.email,
+			password: data.password,
+			role: data.role,
+		});
 
 		try {
-			const newUser = await user.save();
-			return {
-				id: newUser.id,
-				name: newUser.name,
-				email: newUser.email,
-				role: newUser.role,
-			};
+			return await this.userRepository.save(newUser);
 		} catch (error) {
 			console.error(error);
 			throw CustomError.internalServer('Error creating user.');
 		}
 	}
 
-	async update(id: string, data: UpdateUserDTO) {
+	// Actualizar un usuario por ID
+	async update(id: string, data: UpdateUserDTO): Promise<{ message: string }> {
 		const user = await this.findOne(id);
-		user.name = data.name;
-		user.email = data.email;
-		try {
-			await user.save();
-			return {
-				message: 'User updated',
-			};
-		} catch (error) {
-			throw CustomError.internalServer('Error updating user');
-		}
+		await this.userRepository.update(id, {
+			name: data.name,
+			email: data.email,
+		});
+
+		return { message: 'User updated' };
 	}
 
-	async delete(id: string) {
-		const user = await this.findOne(id);
-		user.status = Status.DISABLE;
-		try {
-			await user.save();
-			return { ok: true };
-		} catch (error) {
-			throw CustomError.internalServer('Error deleting user');
-		}
+	// Deshabilitar un usuario
+	async delete(id: string): Promise<{ ok: boolean }> {
+		await this.userRepository.update(id, { status: Status.DISABLE });
+		return { ok: true };
 	}
 
-	async login(email: string, password: string) {
-		const user = await this.findUserByEmail(email);
-
+	// Inicio de sesión de usuario
+	async login(
+		email: string,
+		password: string,
+	): Promise<{ token: string; user: Partial<User> }> {
+		const user = await this.findByEmail(email);
 		const isMatching = await bcryptAdapter.compare(password, user.password);
 		if (!isMatching) throw CustomError.unAuthorized('Invalid credentials');
 
@@ -102,18 +82,12 @@ export class UserService {
 		};
 	}
 
-	async findUserByEmail(email: string) {
-		const user = await User.findOne({
-			where: {
-				email,
-				status: Status.AVAILABLE,
-			},
+	// Buscar usuario por email
+	async findByEmail(email: string): Promise<User> {
+		const user = await this.userRepository.findOne({
+			where: { email, status: Status.AVAILABLE },
 		});
-
-		if (!user) {
-			throw CustomError.notFound('User not found');
-		}
-
+		if (!user) throw CustomError.notFound('User not found');
 		return user;
 	}
 }

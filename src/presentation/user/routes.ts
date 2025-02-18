@@ -1,25 +1,20 @@
 import { Router } from 'express';
-import { UserController } from './controller';
-import { UserService } from '../services/user.service';
 import { AuthMiddleware } from '../middlewares/auth.middleware';
+import { UserController } from '../passwordManager/controllers/user.controller';
+import { UserService } from '../passwordManager/services/user.service';
 
-export class UserRouter {
-	static get routes(): Router {
-		const router = Router();
+const router = Router();
+const userService = new UserService();
+const controller = new UserController(userService);
 
-		const userService = new UserService();
-		const controller = new UserController(userService); //inyeccion de dependencia
+router.post('/login', (req, res) => controller.loginUser(req, res));
+router.post('/', (req, res) => controller.createUser(req, res));
 
-		router.post('/login', controller.loginUser);
-		router.post('/', controller.createUser);
+router.use(AuthMiddleware.protect);
 
-		router.use(AuthMiddleware.protect);
+router.get('/', (req, res) => controller.findAllUsers(req, res));
+router.get('/:id', (req, res) => controller.findOneUser(req, res));
+router.patch('/:id', (req, res) => controller.updateUser(req, res));
+router.delete('/:id', (req, res) => controller.deleteUser(req, res));
 
-		router.get('/', controller.findAllUsers);
-		router.get('/:id', controller.findOneUser);
-		router.patch('/:id', controller.updateUser);
-		router.delete('/:id', controller.deleteUser);
-
-		return router;
-	}
-}
+export default router;

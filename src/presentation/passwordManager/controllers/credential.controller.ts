@@ -1,12 +1,10 @@
 import { Request, Response } from 'express';
 import { CredentialService } from '../services/credential.service';
-// import { Pin } from '../../data/postgres/models/pin/pin.model';
 import '../../types/express';
 
-//... resto del código...
-
 export class CredentialController {
-	static async addCredential(req: Request, res: Response): Promise<void> {
+	//
+	static async addCredential(req: Request, res: Response): Promise<Response> {
 		try {
 			const {
 				userId,
@@ -26,35 +24,43 @@ export class CredentialController {
 				code_1,
 				code_2,
 			);
-			res.status(201).json(newCredential);
+			return res.status(201).json(newCredential);
 		} catch (error: any) {
-			res.status(500).json({ message: error.message });
+			return res.status(500).json({ message: error.message });
 		}
 	}
-
-	static async getCredentials(req: Request, res: Response): Promise<void> {
+	//
+	static async getCredentials(req: Request, res: Response): Promise<Response> {
 		try {
-			const userId = req.user.id;
+			const userId = req.user?.id;
+			if (!userId) {
+				return res.status(401).json({ message: 'Usuario no autenticado' });
+			}
 			const additionalParam =
 				req.query.additionalParam || req.body.additionalParam;
 			const credentials = await CredentialService.getCredentials(
 				userId,
 				additionalParam,
 			);
-			res.status(200).json(credentials);
+			return res.status(200).json(credentials);
 		} catch (error: any) {
-			res.status(400).json({ message: error.message });
+			return res.status(400).json({ message: error.message });
 		}
 	}
-
-	static async updateCredential(req: Request, res: Response): Promise<void> {
+	//
+	static async updateCredential(
+		req: Request,
+		res: Response,
+	): Promise<Response> {
 		try {
-			const userId = req.user.id;
+			const userId = req.user?.id;
+			if (!userId) {
+				return res.status(401).json({ message: 'Usuario no autenticado' });
+			}
 			const { credentialId, pin, newData } = req.body;
 
 			if (!credentialId || !pin || !newData) {
-				res.status(400).json({ message: 'Faltan datos requeridos' });
-				return;
+				return res.status(400).json({ message: 'Faltan datos requeridos' });
 			}
 
 			const response = await CredentialService.updateCredential(
@@ -63,20 +69,25 @@ export class CredentialController {
 				pin,
 				newData,
 			);
-			res.status(200).json(response);
+			return res.status(200).json(response);
 		} catch (error: any) {
-			res.status(400).json({ message: error.message });
+			return res.status(400).json({ message: error.message });
 		}
 	}
-
-	static async deleteCredential(req: Request, res: Response): Promise<void> {
+	//
+	static async deleteCredential(
+		req: Request,
+		res: Response,
+	): Promise<Response> {
 		try {
-			const userId = req.user.id;
+			const userId = req.user?.id;
+			if (!userId) {
+				return res.status(401).json({ message: 'Usuario no autenticado' });
+			}
 			const { credentialId, pin } = req.body;
 
 			if (!credentialId || !pin) {
-				res.status(400).json({ message: 'Faltan datos requeridos' });
-				return;
+				return res.status(400).json({ message: 'Faltan datos requeridos' });
 			}
 
 			const response = await CredentialService.deleteCredential(
@@ -84,9 +95,9 @@ export class CredentialController {
 				credentialId,
 				pin,
 			);
-			res.status(200).json(response);
+			return res.status(200).json(response);
 		} catch (error: any) {
-			res.status(400).json({ message: error.message });
+			return res.status(400).json({ message: error.message });
 		}
 	}
 }

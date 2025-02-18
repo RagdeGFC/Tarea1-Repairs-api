@@ -4,8 +4,10 @@ import { AuthMiddleware } from '../../middlewares/auth.middleware';
 
 const router = Router();
 
+//bandera
 console.log('📌 Cargando securityBox.routes.ts...');
 
+// Endpoint #1
 router.post(
 	'/',
 	(req: Request, res: Response, next: NextFunction) => {
@@ -15,7 +17,7 @@ router.post(
 		await SecurityBoxController.createSecurityBox(req, res);
 	},
 );
-
+// Endpoint #2
 router.get(
 	'/',
 	(req: Request, res: Response, next: NextFunction) => {
@@ -26,21 +28,16 @@ router.get(
 	},
 );
 
-// 📌 Endpoint #3 Listar Categorías
+// Endpoint #3 Listar Categorías
 router.get(
 	'/categories',
-	(req: Request, res: Response, next: NextFunction) => {
-		AuthMiddleware.protect(req as any, res, next);
-	},
-	async (req: Request, res: Response) => {
-		console.log('📌 Ejecutando SecurityBoxController.getCategories...');
-		await SecurityBoxController.getCategories(req, res);
-	},
+	AuthMiddleware.protect,
+	SecurityBoxController.getCategories,
 );
-// bandera
-console.log('✅ securityBox.routes.ts se ha cargado correctamente.');
 
-// Endpoint #4: Ver detalle de un baúl de contraseñas
-router.get('/:securityBoxId', SecurityBoxController.getSecurityBoxById);
+//bandera
+console.log('📌 Ruta /categories registrada correctamente.');
+
+// Endpoint #4
 
 export default router;

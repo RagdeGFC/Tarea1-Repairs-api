@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { PasswordService } from '../services/password.service';
 
 export class PasswordController {
+	//
 	static async savePassword(req: Request, res: Response) {
 		try {
 			const { userId, service, password } = req.body;
@@ -21,7 +22,7 @@ export class PasswordController {
 			return res.status(400).json({ message: error.message });
 		}
 	}
-
+	//
 	static async getPasswords(req: Request, res: Response) {
 		try {
 			const { userId } = req.query;

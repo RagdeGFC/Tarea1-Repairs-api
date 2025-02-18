@@ -1,19 +1,9 @@
-import { Request, Response } from 'express';
+import { Router } from 'express';
+import { AuthController } from '../controllers/auth.controller';
 
-export class AuthController {
-	static async register(req: Request, res: Response): Promise<void> {
-		try {
-			res.status(201).json({ message: 'Usuario registrado con éxito' });
-		} catch (error: any) {
-			res.status(500).json({ error: error.message });
-		}
-	}
+const router = Router();
 
-	static async login(req: Request, res: Response): Promise<void> {
-		try {
-			res.status(200).json({ message: 'Inicio de sesión exitoso' });
-		} catch (error: any) {
-			res.status(500).json({ error: error.message });
-		}
-	}
-}
+router.post('/login', AuthController.login);
+router.post('/register', AuthController.register);
+
+export default router;

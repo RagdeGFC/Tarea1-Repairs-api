@@ -1,45 +1,41 @@
 import 'dotenv/config';
 import 'reflect-metadata';
-import { PostgresDatabase } from './data/postgres/postgres-database';
-import { envs } from './config';
 import express from 'express';
-//? estos  archivos no estan enviando informacion********************************************************
-import routes from './presentation/routes';
-import securityBoxRoutes from './presentation/passwordManager/routes/securityBox.routes';
-//? ***************************************************************************************************
 const cors = require('cors'); // import cors from 'cors'; no funcionó
+import { DataSource } from 'typeorm';
+import authRoutes from './routes/auth.routes'; // Rutas de autenticación
+import userRoutes from './routes/user.routes'; // Rutas de usuarios
+import dotenv from 'dotenv';
+dotenv.config();
 
-async function main() {
-	try {
-		// Conectar a la base de datos
-		const postgres = new PostgresDatabase();
-		await postgres.connect();
-		console.log('✅ Database connected successfully!');
+const app = express();
 
-		// Crear la aplicación Express
-		const app = express();
+// Configuración de la base de datos usando TypeORM
+export const AppDataSource = new DataSource({
+	type: 'postgres',
+	url: process.env.DATABASE_URL,
+	synchronize: true, // Sincroniza las tablas de la base de datos
+	logging: false,
+	entities: ['src/entities/*.ts'], // Las entidades deben estar en esta carpeta
+});
 
-		// Configurar middlewares
-		app.use(cors());
-		app.use(express.json());
+// Inicializa la conexión a la base de datos
+AppDataSource.initialize()
+	.then(() => {
+		console.log('📦 Conectado a la base de datos!');
+	})
+	.catch((error) =>
+		console.error('Error conectando a la base de datos:', error),
+	);
 
-		//bandera
-		console.log('📌 Registrando rutas en Express...');
+app.use(cors());
+app.use(express.json());
 
-		// Registrar rutas principales
-		app.use('/api', routes);
-		app.use('/api/security_box', securityBoxRoutes);
-		console.log('📌 Rutas de securityBox registradas directamente en app.ts');
+// Registrar las rutas
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
-		// Iniciar el servidor
-		const PORT = envs.PORT || 3000;
-		app.listen(PORT, () => {
-			console.log(`✅ Server started on port ${PORT} 🚀`);
-		});
-	} catch (error) {
-		console.error('❌ Error starting the server:', error);
-		process.exit(1);
-	}
-}
-
-main();
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+	console.log(`Servidor corriendo en puerto ${PORT} 🚀`);
+});

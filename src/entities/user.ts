@@ -29,7 +29,7 @@ export class User {
 	securityPin?: string;
 
 	// Relation with SecurityBox
-	@OneToMany(() => SecurityBox, (SecurityBox) => securityBox.user)
+	@OneToMany(() => SecurityBox, (securityBox) => securityBox.user)
 	securityBoxes!: SecurityBox[];
 
 	// Hash security pin before saving

@@ -1,7 +1,7 @@
 import { encryptPassword, decryptPassword } from '../utils/encryption';
 import { User } from '../entities/user';
-import { Password } from '../entities/Password';
 import { AppDataSource } from '../app';
+import { Password } from '../entities/password';
 
 export class PasswordService {
 	// Save a new password

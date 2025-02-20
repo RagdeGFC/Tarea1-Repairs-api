@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { SecurityBox } from './securityBox';
-import { Pin } from './Pin';
+import { Pin } from './pin';
 
 @Entity('credential_storage')
 export class CredentialStorage {

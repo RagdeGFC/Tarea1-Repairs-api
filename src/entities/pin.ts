@@ -1,27 +1,26 @@
 import {
-	Entity,
-	PrimaryGeneratedColumn,
 	Column,
+	Entity,
 	ManyToOne,
 	OneToMany,
+	PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from './user.model';
-import { CredentialStorage } from './credentialStorage.model';
-// import { User } from '../user.model';
-// import { CredentialStorage } from '../credentialStorage.model';
+import { CredentialStorage } from './credential.storage';
+import { User } from './user';
 
 @Entity('pin')
-class Pin {
+export class Pin {
 	@PrimaryGeneratedColumn('uuid')
 	id!: string;
 
 	@Column({ length: 6 })
 	code!: string;
 
+	// Relation with User
 	@ManyToOne(() => User)
 	user!: User;
 
+	// Relation with CredentialStorage
 	@OneToMany(() => CredentialStorage, (credential) => credential.pin)
 	credentials!: CredentialStorage[];
 }
-export default Pin;

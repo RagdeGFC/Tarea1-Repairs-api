@@ -1,10 +1,9 @@
-import { AppDataSource } from '../config/postgres-database';
-import { Category } from '../models/category.model';
-import { SecurityBox } from '../models/securityBox.model';
-import { User } from '../models/user.model';
+import { User } from '../entities/user';
+import { SecurityBox } from '../entities/securityBox';
+import { AppDataSource } from '../app';
 
 export class SecurityBoxService {
-	//Endpoint #1
+	// Create a new security box
 	static async createSecurityBox(
 		userId: string,
 		name: string,
@@ -15,7 +14,10 @@ export class SecurityBoxService {
 		const securityBoxRepository = AppDataSource.getRepository(SecurityBox);
 
 		const user = await userRepository.findOne({ where: { id: userId } });
-		if (!user) throw new Error('Usuario no encontrado');
+		if (!user) {
+			console.error('❌ User not found.');
+			throw new Error('❌ User not found');
+		}
 
 		const newSecurityBox = securityBoxRepository.create({
 			name,
@@ -25,22 +27,18 @@ export class SecurityBoxService {
 		});
 		await securityBoxRepository.save(newSecurityBox);
 
+		console.log('✅ Security box successfully created.');
 		return newSecurityBox;
 	}
-	//Endpoint #2
+
+	// Retrieve all security boxes for a user
 	static async getSecurityBoxes(userId: string) {
 		const securityBoxRepository = AppDataSource.getRepository(SecurityBox);
-		return await securityBoxRepository.find({
+		const securityBoxes = await securityBoxRepository.find({
 			where: { user: { id: userId } },
 		});
-	}
 
-	// Endpoint #3 Listar Categorías
-	static async getCategories() {
-		const categoryRepository = AppDataSource.getRepository(Category);
-		const categories = await categoryRepository.find();
-		return categories;
+		console.log('✅ Security boxes successfully retrieved.');
+		return securityBoxes;
 	}
-
-	// Endpoint #4
 }

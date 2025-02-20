@@ -1,33 +1,49 @@
-import { Request, Response, Router } from 'express';
 import { CredentialController } from '../controllers/credential.controller';
-import { AuthMiddleware } from '../config/auth.middleware';
+import { authMiddleware } from '../middlewares/auth.middleware';
+import { Router, Request, Response, NextFunction } from 'express';
 
 const router = Router();
 
-// Aplicar middleware de autenticación a todas las rutas
-router.use(AuthMiddleware.protect);
-
-router.post('/api/credential_storage', async (req: Request, res: Response) => {
-	await CredentialController.addCredential(req, res);
-});
-
+// Add a new credential
 router.post(
-	'/api/credential_storage/get',
+	'/',
+	(req: Request, res: Response, next: NextFunction) =>
+		authMiddleware(req as any, res, next),
 	async (req: Request, res: Response) => {
+		console.log('✅ Adding new credential.');
+		await CredentialController.addCredential(req, res);
+	},
+);
+
+// Retrieve credentials
+router.post(
+	'/get',
+	(req: Request, res: Response, next: NextFunction) =>
+		authMiddleware(req as any, res, next),
+	async (req: Request, res: Response) => {
+		console.log('✅ Retrieving credentials.');
 		await CredentialController.getCredentials(req, res);
 	},
 );
 
+// Update a credential
 router.put(
-	'/api/credential_storage/update',
+	'/update',
+	(req: Request, res: Response, next: NextFunction) =>
+		authMiddleware(req as any, res, next),
 	async (req: Request, res: Response) => {
+		console.log('✅ Updating credential.');
 		await CredentialController.updateCredential(req, res);
 	},
 );
 
+// Delete a credential
 router.delete(
-	'/api/credential_storage/delete',
+	'/delete',
+	(req: Request, res: Response, next: NextFunction) =>
+		authMiddleware(req as any, res, next),
 	async (req: Request, res: Response) => {
+		console.log('✅ Deleting credential.');
 		await CredentialController.deleteCredential(req, res);
 	},
 );

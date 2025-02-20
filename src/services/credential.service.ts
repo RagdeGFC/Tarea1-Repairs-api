@@ -1,13 +1,14 @@
 import crypto from 'crypto';
+import { CredentialStorage } from '../entities/credential.storage';
+import { SecurityBox } from '../entities/securityBox';
+import { User } from '../entities/user';
 import { UserService } from './user.service';
-import { AppDataSource } from '../config/postgres-database';
-import { CredentialStorage } from '../models/credentialStorage.model';
-import { SecurityBox } from '../models/securityBox.model';
-import { User } from '../models/user.model';
+import { AppDataSource } from '../app';
 
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'mySecretKey123456';
 const IV_LENGTH = 16;
 
+// Encrypt text
 function encrypt(text: string): string {
 	const iv = crypto.randomBytes(IV_LENGTH);
 	const cipher = crypto.createCipheriv(
@@ -20,6 +21,7 @@ function encrypt(text: string): string {
 	return iv.toString('hex') + ':' + encrypted.toString('hex');
 }
 
+// Decrypt text
 function decrypt(text: string): string {
 	const textParts = text.split(':');
 	const iv = Buffer.from(textParts[0], 'hex');
@@ -35,23 +37,28 @@ function decrypt(text: string): string {
 }
 
 export class CredentialService {
+	// Retrieve credentials
 	static async getCredentials(userId: string, pin: string) {
 		const credentialRepository = AppDataSource.getRepository(CredentialStorage);
 
 		const isValidPin = await UserService.validateSecurityPin(userId, pin);
-
-		if (!isValidPin) throw new Error('PIN de seguridad incorrecto');
+		if (!isValidPin) {
+			console.error('❌ Incorrect security PIN.');
+			throw new Error('❌ Incorrect security PIN');
+		}
 
 		const credentials = await credentialRepository.find({
 			where: { securityBox: { user: { id: userId } } },
 		});
 
+		console.log('✅ Credentials successfully retrieved.');
 		return credentials.map((cred) => ({
 			...cred,
 			password: decrypt(cred.password),
 		}));
 	}
 
+	// Add a new credential
 	static async addCredential(
 		userId: string,
 		securityBoxId: string,
@@ -66,15 +73,20 @@ export class CredentialService {
 		const credentialRepository = AppDataSource.getRepository(CredentialStorage);
 
 		const user = await userRepository.findOne({ where: { id: userId } });
-		if (!user) throw new Error('Usuario no encontrado');
+		if (!user) {
+			console.error('❌ User not found.');
+			throw new Error('❌ User not found');
+		}
 
 		const securityBox = await securityBoxRepository.findOne({
 			where: { id: securityBoxId, user: { id: userId } },
 		});
-		if (!securityBox) throw new Error('Security Box no encontrada');
+		if (!securityBox) {
+			console.error('❌ Security Box not found.');
+			throw new Error('❌ Security Box not found');
+		}
 
 		const encryptedPassword = encrypt(password);
-
 		const newCredential = credentialRepository.create({
 			account,
 			password: encryptedPassword,
@@ -85,9 +97,11 @@ export class CredentialService {
 		});
 
 		await credentialRepository.save(newCredential);
+		console.log('✅ Credential successfully added.');
 		return newCredential;
 	}
 
+	// Update an existing credential
 	static async updateCredential(
 		userId: string,
 		credentialId: string,
@@ -97,22 +111,29 @@ export class CredentialService {
 		const credentialRepository = AppDataSource.getRepository(CredentialStorage);
 
 		const isValidPin = await UserService.validateSecurityPin(userId, pin);
-		if (!isValidPin) throw new Error('PIN de seguridad incorrecto');
+		if (!isValidPin) {
+			console.error('❌ Incorrect security PIN.');
+			throw new Error('❌ Incorrect security PIN');
+		}
 
 		const credential = await credentialRepository.findOne({
 			where: { id: credentialId, securityBox: { user: { id: userId } } },
 		});
-
-		if (!credential) throw new Error('Credencial no encontrada');
+		if (!credential) {
+			console.error('❌ Credential not found.');
+			throw new Error('❌ Credential not found');
+		}
 
 		if (newData.service) credential.service = newData.service;
 		if (newData.username) credential.username = newData.username;
 		if (newData.password) credential.password = encrypt(newData.password);
 
 		await credentialRepository.save(credential);
-		return { message: 'Credencial actualizada con éxito' };
+		console.log('✅ Credential successfully updated.');
+		return { message: '✅ Credential successfully updated' };
 	}
 
+	// Delete a credential
 	static async deleteCredential(
 		userId: string,
 		credentialId: string,
@@ -121,15 +142,21 @@ export class CredentialService {
 		const credentialRepository = AppDataSource.getRepository(CredentialStorage);
 
 		const isValidPin = await UserService.validateSecurityPin(userId, pin);
-		if (!isValidPin) throw new Error('PIN de seguridad incorrecto');
+		if (!isValidPin) {
+			console.error('❌ Incorrect security PIN.');
+			throw new Error('❌ Incorrect security PIN');
+		}
 
 		const credential = await credentialRepository.findOne({
 			where: { id: credentialId, securityBox: { user: { id: userId } } },
 		});
-
-		if (!credential) throw new Error('Credencial no encontrada');
+		if (!credential) {
+			console.error('❌ Credential not found.');
+			throw new Error('❌ Credential not found');
+		}
 
 		await credentialRepository.remove(credential);
-		return { message: 'Credencial eliminada con éxito' };
+		console.log('✅ Credential successfully deleted.');
+		return { message: '✅ Credential successfully deleted' };
 	}
 }

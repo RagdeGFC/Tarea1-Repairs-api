@@ -1,23 +1,27 @@
-import { Request, Response, Router } from 'express';
 import { PasswordController } from '../controllers/password.controller';
+import { Router, Request, Response } from 'express';
 
 const router = Router();
 
+// Save a new password
 router.post('/save', async (req: Request, res: Response) => {
 	try {
-		const result = await PasswordController.savePassword(req, res);
-		res.status(200).json(result);
+		console.log('✅ Saving password.');
+		await PasswordController.savePassword(req, res);
 	} catch (error: any) {
-		res.status(500).json({ error: error.message });
+		console.error('❌ Error saving password:', error);
+		res.status(500).json({ error: '❌ Unknown error' });
 	}
 });
 
+// Retrieve stored passwords
 router.get('/list', async (req: Request, res: Response) => {
 	try {
-		const result = await PasswordController.getPasswords(req, res);
-		res.status(200).json(result);
+		console.log('✅ Retrieving password list.');
+		await PasswordController.getPasswords(req, res);
 	} catch (error: any) {
-		res.status(500).json({ error: error.message });
+		console.error('❌ Error retrieving passwords:', error);
+		res.status(500).json({ error: '❌ Unknown error' });
 	}
 });
 

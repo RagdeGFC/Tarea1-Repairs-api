@@ -1,18 +1,36 @@
-import { Router } from 'express';
-import { UserService } from '../services/user.service';
 import { UserController } from '../controllers/user.controller';
+import { Router, Request, Response } from 'express';
 
 const router = Router();
-const userService = new UserService();
-const controller = new UserController(userService);
 
-// ✅ Definir rutas correctamente
-router.post('/register', (req, res) => controller.createUser(req, res));
-router.post('/login', (req, res) => controller.loginUser(req, res));
-router.get('/', (req, res) => controller.findAllUsers(req, res));
-router.get('/:id', (req, res) => controller.findOneUser(req, res));
-router.patch('/:id', (req, res) => controller.updateUser(req, res));
-router.delete('/:id', (req, res) => controller.deleteUser(req, res));
+// Retrieve all users
+router.get('/', (req: Request, res: Response) => {
+	console.log('✅ Retrieving all users.');
+	UserController.getAllUsers(req, res);
+});
 
-// ✅ Exportar correctamente el router
+// Set security PIN
+router.post('/set-pin', (req: Request, res: Response) => {
+	console.log('✅ Setting security PIN.');
+	UserController.setSecurityPin(req, res);
+});
+
+// Register a new user
+router.post('/register', (req: Request, res: Response) => {
+	console.log('✅ Registering new user.');
+	UserController.register(req, res);
+});
+
+// User login
+router.post('/login', (req: Request, res: Response) => {
+	console.log('✅ User logging in.');
+	UserController.login(req, res);
+});
+
+// Reset security PIN
+router.post('/reset-pin', (req: Request, res: Response) => {
+	console.log('✅ Resetting security PIN.');
+	UserController.resetSecurityPin(req, res);
+});
+
 export default router;

@@ -1,16 +1,15 @@
 import {
-	Entity,
-	PrimaryGeneratedColumn,
 	Column,
+	Entity,
 	ManyToOne,
 	OneToMany,
-	BaseEntity,
+	PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from './user.model';
-import { CredentialStorage } from './credentialStorage.model';
+import { CredentialStorage } from './credential.storage';
+import { User } from './user';
 
-@Entity()
-export class SecurityBox extends BaseEntity {
+@Entity('security_box')
+export class SecurityBox {
 	@PrimaryGeneratedColumn('uuid')
 	id!: string;
 
@@ -26,9 +25,11 @@ export class SecurityBox extends BaseEntity {
 	@Column({ default: 'active' })
 	status!: string;
 
+	// Relation with User
 	@ManyToOne(() => User, (user) => user.securityBoxes)
 	user!: User;
 
+	// Relation with CredentialStorage
 	@OneToMany(() => CredentialStorage, (credential) => credential.securityBox)
-	credentials!: CredentialStorage;
+	credentials!: CredentialStorage[];
 }

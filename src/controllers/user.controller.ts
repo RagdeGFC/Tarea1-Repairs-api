@@ -1,69 +1,124 @@
-import { Request, Response } from 'express';
 import { UserService } from '../services/user.service';
+import { Response, Request } from 'express';
+
+interface CustomRequest extends Request {
+	user?: { id: string };
+}
 
 export class UserController {
-	constructor(private userService: UserService) {}
-
-	async findAllUsers(req: Request, res: Response) {
+	// Reset security PIN
+	static async resetSecurityPin(req: Request, res: Response): Promise<void> {
 		try {
-			const users = await this.userService.getAll();
-			res.json(users);
-		} catch (error) {
-			res.status(500).json({ message: 'Error al obtener usuarios' });
-		}
-	}
+			const { email, recoveryCode, newPin } = req.body;
 
-	async findOneUser(req: Request, res: Response) {
-		try {
-			const user = await this.userService.findById(req.params.id);
-			if (!user)
-				return res.status(404).json({ message: 'Usuario no encontrado' });
-			res.json(user);
-		} catch (error) {
-			res.status(500).json({ message: 'Error al buscar usuario' });
-		}
-	}
+			if (!email || !recoveryCode || !newPin) {
+				console.error('❌ Missing required fields for resetting security PIN.');
+				res.status(400).json({ message: '❌ All fields are required' });
+				return;
+			}
 
-	async createUser(req: Request, res: Response) {
-		try {
-			console.log('📌 createUser() fue llamado con datos:', req.body);
-
-			const newUser = await this.userService.create(req.body);
-			res.status(201).json(newUser);
-		} catch (error) {
-			res.status(500).json({ message: 'Error al crear usuario' });
-		}
-	}
-
-	async updateUser(req: Request, res: Response) {
-		try {
-			const updatedUser = await this.userService.update(
-				req.params.id,
-				req.body,
+			const response = await UserService.resetSecurityPin(
+				email,
+				recoveryCode,
+				newPin,
 			);
-			res.json(updatedUser);
-		} catch (error) {
-			res.status(500).json({ message: 'Error al actualizar usuario' });
+
+			console.log('✅ Security PIN successfully reset.');
+			res.status(200).json(response);
+		} catch (error: any) {
+			console.error('❌ Error resetting security PIN:', error);
+			res.status(500).json({ message: '❌ Unknown error' });
 		}
 	}
 
-	async deleteUser(req: Request, res: Response) {
+	// Set a new security PIN
+	static async setSecurityPin(
+		req: CustomRequest,
+		res: Response,
+	): Promise<void> {
 		try {
-			await this.userService.delete(req.params.id);
-			res.status(204).send();
-		} catch (error) {
-			res.status(500).json({ message: 'Error al eliminar usuario' });
+			const userId = req.user?.id;
+			const { pin } = req.body;
+
+			if (!userId) {
+				console.error('❌ User not authenticated.');
+				res.status(400).json({ message: '❌ User not authenticated' });
+				return;
+			}
+
+			if (!pin || pin.length !== 4) {
+				console.error('❌ Invalid PIN format.');
+				res.status(400).json({ message: '❌ PIN must be a 4-digit number' });
+				return;
+			}
+
+			const response = await UserService.setSecurityPin(userId, pin);
+
+			console.log('✅ Security PIN successfully set.');
+			res.status(200).json(response);
+		} catch (error: any) {
+			console.error('❌ Error setting security PIN:', error);
+			res.status(500).json({ message: '❌ Unknown error' });
 		}
 	}
 
-	async loginUser(req: Request, res: Response) {
+	// Register a new user
+	static async register(req: Request, res: Response): Promise<void> {
 		try {
-			const user = await this.userService.login(req.body);
-			if (!user)
-				return res.status(401).json({ message: 'Credenciales incorrectas' });
-			res.json(user);
-		} catch (error) {
-			res.status(500).json({ message: 'Error al iniciar sesión' });
+			const { name, surname, email, cellphone, password } = req.body;
+
+			if (!name || !surname || !email || !cellphone || !password) {
+				console.error('❌ Missing required fields for user registration.');
+				res.status(400).json({ message: '❌ All fields are required' });
+				return;
+			}
+
+			const response = await UserService.registerUser(
+				name,
+				surname,
+				email,
+				cellphone,
+				password,
+			);
+
+			console.log('✅ User successfully registered.');
+			res.status(201).json(response);
+		} catch (error: any) {
+			console.error('❌ Error registering user:', error);
+			res.status(500).json({ message: '❌ Unknown error' });
+		}
+	}
+
+	// Log in a user
+	static async login(req: Request, res: Response): Promise<void> {
+		try {
+			const { email, password } = req.body;
+
+			if (!email || !password) {
+				console.error('❌ Missing email or password.');
+				res.status(400).json({ message: '❌ Email and password are required' });
+				return;
+			}
+
+			const response = await UserService.loginUser(email, password);
+			console.log('✅ User successfully logged in.');
+			res.status(200).json(response);
+		} catch (error: any) {
+			console.error('❌ Error logging in user:', error);
+			res.status(500).json({ message: '❌ Unknown error' });
+		}
+	}
+
+	// Retrieve all users
+	static async getAllUsers(req: Request, res: Response): Promise<void> {
+		try {
+			const users = await UserService.getAllUsers();
+
+			console.log('✅ Users successfully retrieved.');
+			res.status(200).json(users);
+		} catch (error: any) {
+			console.error('❌ Error retrieving users:', error);
+			res.status(500).json({ message: '❌ Unknown error' });
 		}
 	}
 }

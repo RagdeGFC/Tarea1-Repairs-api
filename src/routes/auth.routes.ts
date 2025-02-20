@@ -1,10 +1,25 @@
-import { Router } from 'express';
-import AuthController from '../controllers/auth.controller';
+import { Response, Request } from 'express';
 
-const router = Router();
+export class AuthController {
+	// Register a new user
+	static async register(req: Request, res: Response): Promise<void> {
+		try {
+			console.log('✅ User successfully registered.');
+			res.status(201).json({ message: '✅ User successfully registered' });
+		} catch (error: any) {
+			console.error('❌ Error registering user:', error);
+			res.status(500).json({ error: '❌ Unknown error' });
+		}
+	}
 
-// Rutas de autenticación
-router.post('/login', AuthController.login);
-router.post('/register', AuthController.register);
-
-export default router;
+	// Log in a user
+	static async login(req: Request, res: Response): Promise<void> {
+		try {
+			console.log('✅ Login successful.');
+			res.status(200).json({ message: '✅ Login successful' });
+		} catch (error: any) {
+			console.error('❌ Error logging in:', error);
+			res.status(500).json({ error: '❌ Unknown error' });
+		}
+	}
+}

@@ -1,12 +1,7 @@
-import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { User } from '../entities/user';
-import { AppDataSource } from '../app';
-
-dotenv.config();
-
-const userRepository = AppDataSource.getRepository(User);
+import { AppDataSource } from '../config/postgres-database';
 
 export class AuthService {
 	// Register a new user
@@ -17,11 +12,10 @@ export class AuthService {
 		cellphone: string,
 		password: string,
 	) {
+		const userRepository = AppDataSource.getRepository(User);
 		const existingUser = await userRepository.findOne({ where: { email } });
-		if (existingUser) {
-			console.error('❌ User already exists.');
-			throw new Error('❌ User already exists');
-		}
+
+		if (existingUser) throw new Error('❌ User already exists');
 
 		const hashedPassword = await bcrypt.hash(password, 10);
 		const newUser = userRepository.create({
@@ -33,31 +27,25 @@ export class AuthService {
 		});
 
 		await userRepository.save(newUser);
-		console.log('✅ User successfully registered.');
 		return newUser;
 	}
 
-	// Authenticate user and generate token
+	// Log in a user
 	static async login(email: string, password: string) {
+		const userRepository = AppDataSource.getRepository(User);
 		const user = await userRepository.findOne({ where: { email } });
-		if (!user) {
-			console.error('❌ Incorrect credentials.');
-			throw new Error('❌ Incorrect credentials');
-		}
+
+		if (!user) throw new Error('❌ Invalid credentials');
 
 		const isMatch = await bcrypt.compare(password, user.password);
-		if (!isMatch) {
-			console.error('❌ Incorrect credentials.');
-			throw new Error('❌ Incorrect credentials');
-		}
+		if (!isMatch) throw new Error('❌ Invalid credentials');
 
 		const token = jwt.sign(
 			{ id: user.id, email: user.email },
-			process.env.JWT_SECRET as string,
+			process.env.JWT_SECRET || '',
 			{ expiresIn: '1h' },
 		);
 
-		console.log('✅ User successfully logged in.');
-		return { token, user };
+		return { message: '✅ Login successful', token, user };
 	}
 }

@@ -1,13 +1,18 @@
+import { Response } from 'express';
 import { SecurityBoxService } from '../services/securityBox.service';
-import { Response, Request } from 'express';
+import { AuthenticatedRequest } from '../types/express';
 
 export class SecurityBoxController {
-	// Create a new security box
-	static async createSecurityBox(req: Request, res: Response) {
+	// ✅ Create a new Security Box
+	static async createSecurityBox(req: AuthenticatedRequest, res: Response) {
 		try {
-			const userId = req.user.id;
-			const { name, favorite, icon } = req.body;
+			const userId = req.user?.id;
+			if (!userId) {
+				console.error('❌ Unauthorized: No user ID found in request.');
+				return res.status(401).json({ message: '❌ Unauthorized' });
+			}
 
+			const { name, favorite, icon } = req.body;
 			if (!name || favorite === undefined || !icon) {
 				console.error('❌ Missing required fields for creating security box.');
 				return res.status(400).json({ message: '❌ All fields are required' });
@@ -28,10 +33,15 @@ export class SecurityBoxController {
 		}
 	}
 
-	// Retrieve all security boxes for a user
-	static async getSecurityBoxes(req: Request, res: Response) {
+	// ✅ Retrieve all Security Boxes for a user
+	static async getSecurityBoxes(req: AuthenticatedRequest, res: Response) {
 		try {
-			const userId = req.user.id;
+			const userId = req.user?.id;
+			if (!userId) {
+				console.error('❌ Unauthorized: No user ID found in request.');
+				return res.status(401).json({ message: '❌ Unauthorized' });
+			}
+
 			const securityBoxes = await SecurityBoxService.getSecurityBoxes(userId);
 
 			console.log('✅ Security boxes successfully retrieved.');

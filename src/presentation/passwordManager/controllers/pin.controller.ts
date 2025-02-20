@@ -1,3 +1,4 @@
+import 'src/types/express';
 import { Request, Response } from 'express';
 import { PinService } from '../services/pin.service';
 

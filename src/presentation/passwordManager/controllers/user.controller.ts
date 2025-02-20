@@ -1,3 +1,4 @@
+import 'src/types/express';
 import { Request, Response } from 'express';
 import { UserService } from '../services/user.service';
 
@@ -26,7 +27,7 @@ export class UserController {
 
 	async createUser(req: Request, res: Response) {
 		try {
-			console.log('📌 createUser() fue llamado con datos:', req.body); // Agregar log
+			console.log('📌 createUser() fue llamado con datos:', req.body);
 
 			const newUser = await this.userService.create(req.body);
 			res.status(201).json(newUser);

@@ -1,6 +1,7 @@
+import 'src/types/express';
 import { Request, Response } from 'express';
 import { AuthService } from '../services/auth.service';
-
+console.log('📌 Cargando auth.controller.ts...');
 export class AuthController {
 	//
 	static async register(req: Request, res: Response): Promise<Response> {

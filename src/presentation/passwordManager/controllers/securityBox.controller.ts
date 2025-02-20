@@ -1,3 +1,4 @@
+import 'src/types/express';
 import { Request, Response } from 'express';
 import { SecurityBoxService } from '../services/securityBox.service';
 
@@ -35,7 +36,6 @@ export class SecurityBoxController {
 		}
 	}
 	// Endpoint #3 Listar Categorías
-
 	static async getCategories(req: Request, res: Response) {
 		try {
 			const categories = await SecurityBoxService.getCategories();

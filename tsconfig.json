@@ -98,10 +98,14 @@
     // "allowUnreachableCode": true,                     /* Disable error reporting for unreachable code. */
     /* Completeness */
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
-    "skipLibCheck": true, /* Skip type checking all .d.ts files. */
+    "skipLibCheck": false, /* Skip type checking all .d.ts files. */
     "typeRoots": [
       "./src/types",
       "./node_modules/@types"
     ]
-  }
+  },
+  "include": [
+    "src/**/*",
+    "src/types"
+  ],
 }

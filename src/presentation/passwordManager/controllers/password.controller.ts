@@ -1,3 +1,4 @@
+import 'src/types/express';
 import { Request, Response } from 'express';
 import { PasswordService } from '../services/password.service';
 

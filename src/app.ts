@@ -1,11 +1,13 @@
 import 'dotenv/config';
 import 'reflect-metadata';
-import express from 'express';
 import { PostgresDatabase } from './data/postgres/postgres-database';
 import { envs } from './config';
-import routes from './presentation/routes'; // Importamos todas las rutas
+import express from 'express';
+//? estos  archivos no estan enviando informacion********************************************************
+import routes from './presentation/routes';
 import securityBoxRoutes from './presentation/passwordManager/routes/securityBox.routes';
-const cors = require('cors'); // import cors from 'cors'; // no funcionó
+//? ***************************************************************************************************
+const cors = require('cors'); // import cors from 'cors'; no funcionó
 
 async function main() {
 	try {

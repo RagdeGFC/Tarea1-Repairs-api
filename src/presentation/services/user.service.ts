@@ -1,10 +1,11 @@
 import { bcryptAdapter } from '../../config/bcrypt.adapter';
 import { JwtAdapter } from '../../config/jwt.adapter';
 import { Status, User } from '../../data/postgres/models/user.model';
-import { CustomError } from '../../domain/services';
+// import { CustomError } from '../../domain/services';
 import { CreateUserDTO } from '../../domain/dtos/users/create-user.dto';
 import { UpdateUserDTO } from '../../domain/dtos/users/update-user.dto';
 import { AppDataSource } from '../../data/postgres/postgres-database';
+import { CustomError } from '../../domain/errors/custom.error';
 
 export class UserService {
 	private userRepository = AppDataSource.getRepository(User);

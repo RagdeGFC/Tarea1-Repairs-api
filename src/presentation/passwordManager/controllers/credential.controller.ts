@@ -1,6 +1,6 @@
+import 'src/types/express';
 import { Request, Response } from 'express';
 import { CredentialService } from '../services/credential.service';
-import '../../types/express';
 
 export class CredentialController {
 	//

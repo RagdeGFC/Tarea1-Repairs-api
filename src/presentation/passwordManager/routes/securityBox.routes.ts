@@ -1,4 +1,4 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response, Router } from 'express';
 import { SecurityBoxController } from '../controllers/securityBox.controller';
 import { AuthMiddleware } from '../../middlewares/auth.middleware';
 

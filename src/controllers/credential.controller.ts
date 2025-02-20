@@ -30,7 +30,7 @@ export class CredentialController {
 
 	static async getCredentials(req: Request, res: Response): Promise<void> {
 		try {
-			const userId = req.user.id;
+			const userId = req.user.id; // Accedemos a req.user correctamente
 			const additionalParam =
 				req.query.additionalParam || req.body.additionalParam;
 			const credentials = await CredentialService.getCredentials(
@@ -45,7 +45,7 @@ export class CredentialController {
 
 	static async updateCredential(req: Request, res: Response): Promise<void> {
 		try {
-			const userId = req.user.id;
+			const userId = req.user.id; // Accedemos a req.user correctamente
 			const { credentialId, pin, newData } = req.body;
 
 			if (!credentialId || !pin || !newData) {
@@ -67,7 +67,7 @@ export class CredentialController {
 
 	static async deleteCredential(req: Request, res: Response): Promise<void> {
 		try {
-			const userId = req.user.id;
+			const userId = req.user.id; // Accedemos a req.user correctamente
 			const { credentialId, pin } = req.body;
 
 			if (!credentialId || !pin) {

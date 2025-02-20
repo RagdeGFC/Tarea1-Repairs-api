@@ -22,7 +22,8 @@ export class AuthMiddleware {
 			if (!user)
 				return res.status(401).json({ message: 'Usuario no encontrado' });
 
-			req.body.sessionUser = user;
+			req.user = user; // Asignamos el usuario a req.user
+			console.log('Usuario autenticado:', req.user); // Verificamos que req.user esté correctamente asignado
 			next();
 		} catch (error) {
 			return res
